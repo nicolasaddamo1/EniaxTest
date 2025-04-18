@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from services.telegram_service import send_message
+from services.telegram_service import send_message, get_bot_info
 from services.google_maps_service import get_geocode
 
 app = Flask(__name__)
@@ -10,8 +10,13 @@ def telegram_send():
     chat_id = data.get("chat_id")
     text = data.get("text")
     if not chat_id or not text:
-        return jsonify("error": "chat_id and text are required")
+        return jsonify({"error": "chat_id and text are required"})
     result = send_message(chat_id, text)
+    return jsonify(result)
+
+@app.route('/api/telegram/me', methods=['GET'])
+def telegram_get_me():
+    result = get_bot_info()
     return jsonify(result)
 
 @app.route('/api/maps/geocode', methods=['GET'])
