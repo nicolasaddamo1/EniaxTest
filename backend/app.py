@@ -9,6 +9,8 @@ def telegram_send():
     data = request.json
     chat_id = data.get("chat_id")
     text = data.get("text")
+    if not chat_id or not text:
+        return jsonify("error": "chat_id and text are required")
     result = send_message(chat_id, text)
     return jsonify(result)
 
