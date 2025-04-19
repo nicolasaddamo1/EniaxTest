@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 from fastapi  import  FastAPI, HTTPException, Request
 from services.telegram_service import send_message, get_bot_info
 from services.google_maps_service import get_geocode
-from config import META_URL, META_APP_ID, META_APP_SECRET
+from config import META_URL, META_APP_ID, META_APP_SECRET, REDIRECT_URI
 import httpx
 from pydantic import BaseModel
 
@@ -50,6 +50,36 @@ async def auth_facebook_callback(request: AuthRequest):
     )
     
     return user_response.json()
+
+@app.post("/api/facebook/verify")
+async def verify_facebook_token(access_token: str):
+    # Verifica el token con Facebook
+    async with httpx.AsyncClient() as client:
+        # Primero verifica el token
+        debug_response = await client.get(
+            "https://graph.facebook.com/debug_token",
+            params={
+                "input_token": access_token,
+                "access_token": f"{META_APP_ID}|{META_APP_SECRET}"
+            }
+        )
+        
+        if debug_response.status_code != 200:
+            raise HTTPException(status_code=400, detail="Token inválido")
+        
+        debug_data = debug_response.json()
+        if not debug_data.get("data", {}).get("is_valid"):
+            raise HTTPException(status_code=400, detail="Token no válido")
+        
+        # Obtiene los datos del usuario
+        user_response = await client.get(
+            f"https://graph.facebook.com/me?fields=id,name,email&access_token={access_token}"
+        )
+        
+        return {
+            "user": user_response.json(),
+            "token_info": debug_data
+        }
 @app.route('/api/telegram/me', methods=['GET'])
 def telegram_get_me():
     result = get_bot_info()
