@@ -14,6 +14,12 @@ def telegram_send():
     result = send_message(chat_id, text)
     return jsonify(result)
 
+@app.get("/auth/facebook")
+async def auth_facebook():
+    return {
+        "url": META_URL,
+    }
+
 @app.route('/api/telegram/me', methods=['GET'])
 def telegram_get_me():
     result = get_bot_info()
