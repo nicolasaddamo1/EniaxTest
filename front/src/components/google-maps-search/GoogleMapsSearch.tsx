@@ -1,81 +1,30 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
-import { geocodeAddress } from "../services/maps";
+import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-type Geolocation = {
-  latitude: number;
-  longitude: number;
-  place: string;
-};
+const BOMBONERA_COORDS = "-34.635611,-58.364203";
 
 export function GoogleMapsSearch() {
-  const [address, setAddress] = useState("");
-  const [geolocation, setGeolocation] = useState<Geolocation | null>(null);
-  const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
-  const handleGeocodeAddress = async () => {
-    setLoading(true);
-    try {
-      const data = await geocodeAddress(address);
+  if (!apiKey) {
+    return <div>Error: Falta la API Key de Google Maps</div>;
+  }
 
-      setGeolocation(data);
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Error Geocoding Address",
-        description: error.message || "Failed to geocode address.",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const googleMapsUrl = geolocation
-    ? `https://maps.google.com/maps?q=${geolocation.latitude},${geolocation.longitude}&z=15&output=embed`
-    : null;
+  const imageUrl = `https://maps.googleapis.com/maps/api/streetview?size=600x400&location=${BOMBONERA_COORDS}&heading=90&pitch=0&key=${apiKey}`;
 
   return (
-    <div className="flex flex-col space-y-4 h-full">
-      <h2 className="text-lg font-semibold text-center">Google Maps</h2>
-
-      <Input
-        type="text"
-        placeholder="Enter Address"
-        value={address}
-        onChange={(e) => setAddress(e.target.value)}
-      />
-
-      {geolocation && (
-        <div className="mt-4">
-          <p>
-            <strong>Latitude:</strong> {geolocation.latitude}
-          </p>
-          <p>
-            <strong>Longitude:</strong> {geolocation.longitude}
-          </p>
-          <p>
-            <strong>Place:</strong> {geolocation.place}
-          </p>
-        </div>
-      )}
-
-      {googleMapsUrl && (
-        <iframe
-          src={googleMapsUrl}
-          width="100%"
-          height="300"
-          style={{ border: 0 }}
-          loading="lazy"
-        ></iframe>
-      )}
-      <Button onClick={handleGeocodeAddress} disabled={loading} className="w-full mt-auto">
-        {loading ? "Geocode Address" : "Geocode Address"}
-      </Button>
-    </div>
+    <>
+      <CardHeader>
+        <CardTitle>Vista desde la calle - La Bombonera</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <img
+          src={imageUrl}
+          alt="Street View de La Bombonera"
+          className="rounded-lg w-full h-auto object-cover"
+        />
+      </CardContent>
+    </>
   );
 }

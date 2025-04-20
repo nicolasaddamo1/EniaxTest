@@ -1,6 +1,7 @@
 import { FacebookLoginButton } from '@/components/auth/FacebookButton';
 import { FacebookProvider } from '@/components/auth/FacebookProvider';
 import { GoogleMapsSearch } from "@/components/google-maps-search/GoogleMapsSearch";
+import { GoogleMapsCard } from '@/components/map/GoogleMapCard';
 import { TelegramForm } from "@/components/Telegram/TelegramForm";
 import { Card } from "@/components/ui/card";
 import { ViberForm } from "@/components/viber/ViberForm";
@@ -17,9 +18,6 @@ export default function Home() {
               <TelegramForm />
             </Card>
 
-            <Card>
-              <GoogleMapsSearch />
-            </Card>
 
             <Card>
               <ViberForm />
@@ -27,6 +25,17 @@ export default function Home() {
 
             <Card className="flex items-center justify-center p-4">
               <FacebookLoginButton />
+            </Card>
+            <Card className="flex items-center justify-center p-4">
+              <GoogleMapsCard
+                location="Brandsen 805, La Boca, Buenos Aires"
+                title="Estadio La Bombonera"
+                width="100%"
+                height="400px"
+              />
+            </Card>
+            <Card>
+              <GoogleMapsSearch />
             </Card>
           </div>
         </div>
