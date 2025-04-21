@@ -1,27 +1,57 @@
 from flask import Flask, request, jsonify
 from services.telegram_service import send_message, get_bot_info
 from services.google_maps_service import get_geocode
-from config import META_URL, META_APP_ID, META_APP_SECRET, REDIRECT_URI
+from config import META_URL, META_APP_ID, META_APP_SECRET, REDIRECT_URI, TELEGRAM_BOT_TOKEN
+from flask_cors import CORS  
+import requests
+import os
 import httpx
 import asyncio
+import threading
+from services.telegram_service import send_message, get_bot_info, run_bot, get_updates
+BASE_URL = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}"
+
+import time
+
 
 app = Flask(__name__)
+CORS(app)
 
-@app.route('/api/telegram/send', methods=['POST'])
-def telegram_send():
-    data = request.json
+@app.route("/api/telegram/send", methods=["POST"])
+def send_telegram():
+    data = request.get_json()
     chat_id = data.get("chat_id")
-    text = data.get("text")
-    if not chat_id or not text:
-        return jsonify({"error": "chat_id and text are required"})
-    result = send_message(chat_id, text)
+    message = data.get("message")
+
+    if not chat_id or not message:
+        return jsonify({"error": "Faltan datos"}), 400
+
+    telegram_url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+    payload = {
+        "chat_id": chat_id,
+        "text": message
+    }
+
+    res = requests.post(telegram_url, json=payload)
+    response_json = res.json()
+    print("🔁 Respuesta de Telegram:", response_json)
+
+    if response_json.get("ok"):
+        return jsonify({
+            "success": True,
+            "bot_message": response_json["result"]  # 👈 Solo esto
+        }), 200
+    else:
+        return jsonify({
+            "success": False,
+            "error": response_json
+        }), 400
+
+@app.route('/api/telegram/me', methods=['GET'])
+def telegram_get_me():
+    result = get_bot_info()
     return jsonify(result)
 
-@app.get("/auth/facebook")
-async def auth_facebook():
-    return {
-        "url": META_URL,
-    }
 @app.route('/auth/facebook/callback', methods=['POST'])
 def auth_facebook_callback():
     if not request.is_json:
@@ -66,6 +96,7 @@ def auth_facebook_callback():
         return jsonify({"error": error}), 400
     
     return jsonify(user_data)
+
 @app.route('/api/facebook/verify', methods=['POST'])
 def verify_facebook_token():
     # Verifica que el request tenga JSON
@@ -116,16 +147,10 @@ def verify_facebook_token():
         return jsonify(result)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-@app.route('/api/telegram/me', methods=['GET'])
-def telegram_get_me():
-    result = get_bot_info()
-    return jsonify(result)
 
-@app.route('/api/maps/geocode', methods=['GET'])
-def maps_geocode():
-    address = request.args.get("address")
-    result = get_geocode(address)
-    return jsonify(result)
+
 
 if __name__ == '__main__':
+    bot_thread = threading.Thread(target=run_bot, daemon=True)
+    bot_thread.start()
     app.run(debug=True)
