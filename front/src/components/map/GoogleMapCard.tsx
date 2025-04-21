@@ -13,9 +13,9 @@ interface GoogleMapsCardProps {
 
 export function GoogleMapsCard({
     location = "Brandsen 805",
-    title = "La Bombonera",
+    title = "Api Google Maps",
     width = "100%",
-    height = "450px"
+    height = "550px"
 }: GoogleMapsCardProps) {
     if (!apiKey) {
         console.error("Google Maps API key no está configurada");
@@ -28,7 +28,7 @@ export function GoogleMapsCard({
     return (
         <Card>
             <CardHeader>
-                <CardTitle>{title}</CardTitle>
+                <CardTitle>Api Google Maps</CardTitle>
             </CardHeader>
             <CardContent>
                 <iframe

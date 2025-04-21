@@ -2,9 +2,9 @@ import { FacebookLoginButton } from '@/components/auth/FacebookButton';
 import { FacebookProvider } from '@/components/auth/FacebookProvider';
 import { GoogleMapsSearch } from "@/components/google-maps-search/GoogleMapsSearch";
 import { GoogleMapsCard } from '@/components/map/GoogleMapCard';
-import { TelegramForm } from "@/components/Telegram/TelegramForm";
+import TelegramForm from '@/components/Telegram/TelegramForm';
+import TwitterIntegration from '@/components/twitter/TwitterIntegration';
 import { Card } from "@/components/ui/card";
-import { ViberForm } from "@/components/viber/ViberForm";
 
 export default function Home() {
   return (
@@ -17,12 +17,6 @@ export default function Home() {
             <Card>
               <TelegramForm />
             </Card>
-
-
-            <Card>
-              <ViberForm />
-            </Card>
-
             <Card className="flex items-center justify-center p-4">
               <FacebookLoginButton />
             </Card>
@@ -36,6 +30,9 @@ export default function Home() {
             </Card>
             <Card>
               <GoogleMapsSearch />
+            </Card>
+            <Card>
+              <TwitterIntegration />
             </Card>
           </div>
         </div>

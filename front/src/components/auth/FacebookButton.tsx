@@ -1,28 +1,27 @@
 'use client';
 import { useState, useEffect } from 'react';
+import Script from 'next/script';
 
 export function FacebookLoginButton() {
     const [isSdkReady, setIsSdkReady] = useState(false);
 
     useEffect(() => {
-        if (window.FB) {
-            setIsSdkReady(true);
-            return;
-        }
-
-        window.fbAsyncInit = function () {
-            window.FB.init({
-                appId: process.env.NEXT_PUBLIC_FACEBOOK_APP_ID || '',
-                cookie: true,
-                xfbml: true,
-                version: 'v19.0'
-            });
-            setIsSdkReady(true);
+        const checkFB = () => {
+            if (window.FB) {
+                window.FB.init({
+                    appId: process.env.NEXT_PUBLIC_FACEBOOK_APP_ID || '',
+                    cookie: true,
+                    xfbml: true,
+                    version: 'v22.0'
+                });
+                setIsSdkReady(true);
+            } else {
+                setTimeout(checkFB, 100);
+            }
         };
 
-        // No necesitas cargar el script manualmente si usas el Script de Next.js
+        checkFB();
     }, []);
-
     const handleLogin = () => {
         if (!isSdkReady || !window.FB) return;
 
@@ -30,7 +29,6 @@ export function FacebookLoginButton() {
             (response) => {
                 if (response.authResponse) {
                     console.log('Login exitoso:', response.authResponse);
-                    // Manejar login exitoso
                 } else {
                     console.log('Usuario canceló el login');
                 }
@@ -40,13 +38,22 @@ export function FacebookLoginButton() {
     };
 
     return (
-        <button
-            onClick={handleLogin}
-            disabled={!isSdkReady}
-            className={`px-4 py-2 rounded-md text-white ${isSdkReady ? 'bg-[#1877F2] hover:bg-[#166FE5]' : 'bg-gray-400'
-                }`}
-        >
-            {isSdkReady ? 'Continuar con Facebook' : 'Cargando Facebook...'}
-        </button>
+        <>
+            {/* Carga del SDK */}
+            <Script
+                strategy="beforeInteractive"
+                src="https://connect.facebook.net/en_US/sdk.js"
+            />
+
+            {/* Botón */}
+            <button
+                onClick={handleLogin}
+                disabled={!isSdkReady}
+                className={`px-4 py-2 rounded-md text-white ${isSdkReady ? 'bg-[#1877F2] hover:bg-[#166FE5]' : 'bg-gray-400'
+                    }`}
+            >
+                {isSdkReady ? 'Continuar con Facebook' : 'Cargando Facebook...'}
+            </button>
+        </>
     );
 }

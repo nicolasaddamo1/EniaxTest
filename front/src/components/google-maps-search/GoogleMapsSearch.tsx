@@ -11,12 +11,12 @@ export function GoogleMapsSearch() {
     return <div>Error: Falta la API Key de Google Maps</div>;
   }
 
-  const imageUrl = `https://maps.googleapis.com/maps/api/streetview?size=600x400&location=${BOMBONERA_COORDS}&heading=90&pitch=0&key=${apiKey}`;
+  const imageUrl = `https://maps.googleapis.com/maps/api/streetview?size=250x250&location=${BOMBONERA_COORDS}&heading=90&pitch=0&key=${apiKey}`;
 
   return (
     <>
       <CardHeader>
-        <CardTitle>Vista desde la calle - La Bombonera</CardTitle>
+        <CardTitle>Api Street View</CardTitle>
       </CardHeader>
       <CardContent>
         <img

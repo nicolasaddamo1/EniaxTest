@@ -11,3 +11,7 @@ This repository was created to store the technical test for the **Eniax** compan
 
 -Send message to user/users/groups
 -Get information of a bot 
+
+## https://apt-searches-ph-firm.trycloudflare.com/
+
+## https://war-prophet-logos-twiki.trycloudflare.com
